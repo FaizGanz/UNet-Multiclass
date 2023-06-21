@@ -7,7 +7,7 @@ import numpy as np
 import os
 
 class CityscapesDataset(Dataset):
-    def __init__(self, split, root_dir, target_type='semantic', mode='fine', transform=None, eval=False):
+    def __init__(self, split, root_dir, relabelled=True, target_type='semantic', mode='fine', transform=None, eval=False):
         self.transform = transform
         if mode == 'fine':
             self.mode = 'gtFine'
@@ -30,7 +30,7 @@ class CityscapesDataset(Dataset):
     
             # 19-class label items being filtered
             for item in temp:
-                if not item.endswith('labelTrainIds.png', 0, len(item)):
+                if not item.endswith('labelIds.png', 0, len(item)):
                     list_items.remove(item)
 
             # defining paths

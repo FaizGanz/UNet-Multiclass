@@ -4,7 +4,7 @@ from utils import *
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 from torchvision import transforms
-from cityscapesscripts.helpers.labels import trainId2label as t2l
+from cityscapesscripts.helpers.labels import id2label as t2l
 
 if torch.cuda.is_available():
     device = 'cuda:0'
@@ -13,14 +13,14 @@ else:
     device = 'cpu'
     print('Running on the CPU')
 
-ROOT_DIR_CITYSCAPES = 'datasets/cityscapes'
+ROOT_DIR_CITYSCAPES = '../datasets/cityscapes'
 IMAGE_HEIGHT = 300
 IMAGE_WIDTH = 600
 
-MODEL_PATH = "YOUR-MODEL-PATH-WHICH-NEEDS-TO-BE-EVALUATED"
+MODEL_PATH = "../models/unet.pt"
 
-EVAL = False 
-PLOT_LOSS = False
+EVAL = True 
+PLOT_LOSS = True
 
 def save_predictions(data, model):    
     model.eval()
@@ -37,7 +37,6 @@ def save_predictions(data, model):
 
             # Remapping the labels
             pred_labels = pred_labels.to('cpu')
-            pred_labels.apply_(lambda x: t2l[x].id)
             pred_labels = pred_labels.to(device)   
 
             # Resizing predicted images too original size
@@ -46,11 +45,11 @@ def save_predictions(data, model):
             # Configure filename & location to save predictions as images
             s = str(s)
             pos = s.rfind('/', 0, len(s))
-            name = s[pos+1:-18]  
+            name = s[pos+1:-18]
             global location
-            location = 'saved_images\multiclass_1'
+            location = '../imgs'
 
-            utils.save_as_images(pred_labels, location, name, multiclass=True)                
+            save_as_images(pred_labels, location, name)                
 
 def evaluate(path):
     T = transforms.Compose([
@@ -69,7 +68,7 @@ def evaluate(path):
  
     print('Data has been loaded!')
 
-    net = UNET(in_channels=3, classes=19).to(device)
+    net = UNET(in_channels=3, classes=34).to(device)
     checkpoint = torch.load(path)
     net.load_state_dict(checkpoint['model_state_dict'])
     net.eval()
@@ -80,12 +79,12 @@ def plot_losses(path):
     checkpoint = torch.load(path)
     losses = checkpoint['loss_values']
     epoch = checkpoint['epoch']
-    epoch_list = list(range(epoch))
+    epoch_list = list(range(epoch + 1))
 
     plt.plot(epoch_list, losses)
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
-    plt.title(f"Loss over {epoch+1} epoch/s")
+    plt.title(f"Loss over {epoch + 1} epoch/s")
     plt.show()
 
 if __name__ == '__main__':

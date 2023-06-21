@@ -14,14 +14,14 @@ else:
     DEVICE = "cpu"
     print('Running on the CPU')
 
-MODEL_PATH = 'YOUR-MODEL-PATH'
+MODEL_PATH = '../models/unet.pt'
 LOAD_MODEL = False
 ROOT_DIR = '../datasets/cityscapes'
 IMG_HEIGHT = 110  
 IMG_WIDTH = 220  
 BATCH_SIZE = 16 
 LEARNING_RATE = 0.0005
-EPOCHS = 5
+EPOCHS = 8
 
 def train_function(data, model, optimizer, loss_fn, device):
     print('Entering into train function')
@@ -62,7 +62,7 @@ def main():
     print('Data Loaded Successfully!')
 
     # Defining the model, optimizer and loss function
-    unet = UNET(in_channels=3, classes=19).to(DEVICE).train()
+    unet = UNET(in_channels=3, classes=34).to(DEVICE).train()
     optimizer = optim.Adam(unet.parameters(), lr=LEARNING_RATE)
     loss_function = nn.CrossEntropyLoss(ignore_index=255) 
 
